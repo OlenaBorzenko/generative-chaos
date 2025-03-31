@@ -3,6 +3,9 @@
 
 # Production
 /build
+obj
+bin
+.idea/
 
 # Generated files
 .docusaurus

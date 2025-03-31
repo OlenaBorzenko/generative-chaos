@@ -9,8 +9,8 @@ export default function App() {
 
   const handleSubmit = () => {
     const generatedConfig = {
-      p: 3,
-      q: 8,
+      p: 2,
+      q: 7,
       ringDetail: 20,
       pathDetail: 400,
     
@@ -20,21 +20,21 @@ export default function App() {
     
       eccentricity: 0.6,
     
-      twistTurns: 20,           // Wireframe spiral twist (visual)
-      globalTwistTurns: 16.5,   // Actual tube twist along the knot path
+      twistTurns: 10,           // Wireframe spiral twist (visual)
+      globalTwistTurns: 20,   // Actual tube twist along the knot path
       twistDirection: -1,
       
       lumps: 10,             // Number of lumps
       lumpHeight: 0.9,       // Bulge strength
-      lumpOffset: 0.0,       // Phase offset
+      lumpOffset: 0,       // Phase offset
     
       enableElectricity: false,
-      electricityStrength: 0.15,
-      electricityFreq: 2,
+      electricityStrength: 0.3,
+      electricityFreq: 4,
       
-      bgColor: [20, 10, 40],           // space purple
-      fillColor: [255, 100, 0, 90],    // glowing orange
-      wireColor: [255, 255, 255]  
+      bgColor: 'rgb(8, 17, 43)',           // space purple
+      fillColor: 'rgba(186, 57, 143, 0.5)',    // glowing orange
+      wireColor: 'rgb(253, 253, 253)'  
     };
     
     setMainConfig(generatedConfig);

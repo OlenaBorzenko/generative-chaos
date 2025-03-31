@@ -15,13 +15,14 @@ export default function TorusCanvas({ config, width = 800, height = 800 }: Torus
     if (!containerRef.current) return;
 
     const sketch = (s: p5) => {
+      const { bgColor } = config;
       let knotPoints: p5.Vector[] = [];
       let ringPoints: p5.Vector[][] = [];
 
       s.setup = () => {
         s.createCanvas(width, height, s.WEBGL);
         s.ortho(-width / 2, width / 2, -height / 2, height / 2, -1000, 1000);
-        s.background(20, 10, 40);
+        s.background(bgColor);
         s.noLoop();
 
         computeKnotPath();
@@ -53,7 +54,7 @@ export default function TorusCanvas({ config, width = 800, height = 800 }: Torus
       const computeRingsWithParallelTransport = () => {
         const {
           ringDetail, tubeRadius, twistDirection, twistTurns, globalTwistTurns,
-          lumps, lumpHeight, lumpOffset, eccentricity, pathDetail
+          lumps, lumpHeight, lumpOffset, eccentricity, pathDetail, enableElectricity, electricityStrength, electricityFreq
         } = config;
 
         let up = s.createVector(0, 1, 0);
@@ -94,6 +95,13 @@ export default function TorusCanvas({ config, width = 800, height = 800 }: Torus
               p5.Vector.mult(twistedNormal, cx),
               p5.Vector.mult(twistedBinormal, cy)
             ).mult(tubeRadius * lump);
+
+
+            if (enableElectricity) {
+              let n = s.noise(i * 0.05, j * 0.1);
+              offset.mult(1 + electricityStrength * s.sin(s.TWO_PI * electricityFreq * n));
+            }
+
             ring.push(p5.Vector.add(p1, offset));
           }
       
@@ -121,21 +129,20 @@ export default function TorusCanvas({ config, width = 800, height = 800 }: Torus
       };
 
       const drawDepthFill = () => {
-        const { fillColor } = config;
+        const { fillColor, ringDetail } = config;
 
         s.noStroke();
         s.fill(fillColor);
-        const rd = config.ringDetail;
 
         for (let i = 0; i < ringPoints.length - 1; i++) {
           const ringA = ringPoints[i];
           const ringB = ringPoints[i + 1];
 
           s.beginShape(s.QUADS);
-          for (let j = 0; j < rd; j++) {
+          for (let j = 0; j < ringDetail; j++) {
             const a1 = ringA[j];
-            const a2 = ringA[(j + 1) % rd];
-            const b2 = ringB[(j + 1) % rd];
+            const a2 = ringA[(j + 1) % ringDetail];
+            const b2 = ringB[(j + 1) % ringDetail];
             const b1 = ringB[j];
 
             s.vertex(a1.x, a1.y, a1.z);
