@@ -42,8 +42,6 @@ public class GalleryService : IGalleryService
         
         var serialisedConfig = JsonSerializer.Serialize(config);
         
-        //await _cosmosDbService.CachePutAsync(new CacheItem(design.UserInput, description, design.Vectors, serialisedConfig));
-
         design.GeneratedDescription = description;
         design.TorusConfig = serialisedConfig;
         
@@ -59,18 +57,6 @@ public class GalleryService : IGalleryService
         var cacheItems = await _cosmosDbService.GetCacheAsync(vectors, _cacheSimilarityScore);
 
         return cacheItems;
-
-        //List<Design> searchResults = await _semanticKernelService.SearchDesignsAsync(vectors, _designsMaxResults);
-        // cacheItems = searchResults
-        //     .Select(r => new CacheItem(r.UserInput, r.GeneratedDescription, r.Vectors, r.TorusConfig))
-        //     .ToList();
-        //
-        // foreach (var cacheItem in cacheItems)
-        // {
-        //     await _cosmosDbService.CachePutAsync(cacheItem);
-        // }
-        //
-        // return cacheItems;
     }
 
     public async Task<List<Design>> GetDesignsPageAsync()
