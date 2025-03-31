@@ -1,4 +1,4 @@
-using GenerativeChaos.Api.Models;
+using GenerativeChaos.Api.Dtos;
 
 namespace GenerativeChaos.Api;
 

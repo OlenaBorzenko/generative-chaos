@@ -1,14 +1,12 @@
-using GenerativeChaos.Api.Models;
+using GenerativeChaos.Api.Dtos;
 
 namespace GenerativeChaos.Api.Abstractions;
 
 public interface IGalleryService
 {
-    Task<string> GenerateEmbeddingsAndSaveAsync(string designObject);
+    Task<TorusConfig> GenerateDesignAsync(string userInput);
 
-    Task<TorusConfig> GenerateDesignDetailsAsync(string designId);
+    Task<List<DesignDto>> SearchSimilarDesignsAsync(string userInput);
 
-    Task<List<Design>> SearchSimilarDesignsAsync(string userInput);
-
-    Task<List<Design>> GetDesignsPageAsync();
+    Task<List<DesignDto>> GetDesignsPageAsync();
 }

@@ -1,5 +1,6 @@
 using System.Text.Json;
 using GenerativeChaos.Api.Abstractions;
+using GenerativeChaos.Api.Dtos;
 using GenerativeChaos.Api.Models;
 using GenerativeChaos.Api.Options;
 using Microsoft.Extensions.Options;
@@ -25,42 +26,46 @@ public class GalleryService : IGalleryService
         _designsMaxResults = int.TryParse(designsMaxResults, out _designsMaxResults) ? _designsMaxResults: 10;
     }
     
-    public async Task<string> GenerateEmbeddingsAndSaveAsync(string userInput)
+    public async Task<TorusConfig> GenerateDesignAsync(string userInput)
     {
         var embeddings = await _semanticKernelService.GetEmbeddingsAsync(userInput);
-
-        var design = await _cosmosDbService.InsertDesignAsync(new Design(userInput, embeddings));
         
-        return design.id;
-    }
-    
-    public async Task<TorusConfig> GenerateDesignDetailsAsync(string designId)
-    {
-        var design = await _cosmosDbService.GetDesignAsync(designId);
-        
-        var (description, config) = await _semanticKernelService.GenerateDesignConfigurationAsync(design.UserInput);
+        var (description, config) = await _semanticKernelService.GenerateDesignConfigurationAsync(userInput);
         
         var serialisedConfig = JsonSerializer.Serialize(config);
         
-        design.GeneratedDescription = description;
-        design.TorusConfig = serialisedConfig;
+        var design = new Design(userInput, embeddings, description, serialisedConfig);
         
-        await _cosmosDbService.UpdateDesignAsync(design);
+        await _cosmosDbService.InsertDesignAsync(design);
 
         return config;
     }
 
-    public async Task<List<Design>> SearchSimilarDesignsAsync(string userInput)
+    public async Task<List<DesignDto>> SearchSimilarDesignsAsync(string userInput)
     {
         var vectors = await _semanticKernelService.GetEmbeddingsAsync(userInput);
         
-        var cacheItems = await _cosmosDbService.GetCacheAsync(vectors, _cacheSimilarityScore);
+        var cacheItems = await _cosmosDbService.GetSimilarAsync(vectors, _cacheSimilarityScore);
 
-        return cacheItems;
+        return cacheItems.Select(x => new DesignDto
+        {
+            id = x.id, 
+            Description = x.GeneratedDescription,
+            TorusConfig = JsonSerializer.Deserialize<TorusConfig>(x.TorusConfig),
+            UserInput = x.UserInput
+        }).ToList();
     }
 
-    public async Task<List<Design>> GetDesignsPageAsync()
+    public async Task<List<DesignDto>> GetDesignsPageAsync()
     {
-        return await _cosmosDbService.GetDesignsAsync();
+        var designs = await _cosmosDbService.GetDesignsAsync();
+        
+        return designs.Select(x => new DesignDto
+        {
+            id = x.id, 
+            Description = x.GeneratedDescription,
+            TorusConfig = JsonSerializer.Deserialize<TorusConfig>(x.TorusConfig),
+            UserInput = x.UserInput
+        }).ToList();;
     }
 }

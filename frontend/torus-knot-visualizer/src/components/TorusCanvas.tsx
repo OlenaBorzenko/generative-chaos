@@ -3,11 +3,12 @@ import p5 from 'p5';
 
 interface TorusKnotProps {
   config: any;
+  scale?: number;
   width?: number;
   height?: number;
 }
 
-export default function TorusCanvas({ config, width = 800, height = 800 }: TorusKnotProps) {
+export default function TorusCanvas({ config, scale = 200, width = 800, height = 800 }: TorusKnotProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const p5InstanceRef = useRef<p5 | null>(null);
 
@@ -29,7 +30,7 @@ export default function TorusCanvas({ config, width = 800, height = 800 }: Torus
         computeRingsWithParallelTransport();
 
         s.rotateX(s.HALF_PI * 2);
-        s.scale(200);
+        s.scale(scale);
 
         drawDepthFill();
         drawWireframe();

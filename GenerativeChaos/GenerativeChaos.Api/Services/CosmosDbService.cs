@@ -58,7 +58,7 @@ public class CosmosDbService
         );
     }
 
-    public async Task<List<Design>> GetCacheAsync(ReadOnlyMemory<float> vectors, double similarityScore)
+    public async Task<List<Design>> GetSimilarAsync(ReadOnlyMemory<float> vectors, double similarityScore)
     {
         var result = new List<Design>();
 

@@ -1,5 +1,5 @@
 using System.Text.Json;
-using GenerativeChaos.Api.Models;
+using GenerativeChaos.Api.Dtos;
 using GenerativeChaos.Api.Options;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Options;

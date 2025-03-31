@@ -8,26 +8,11 @@ namespace GenerativeChaos.Api.Controllers;
 public class GalleryController(IGalleryService galleryService) : Controller
 {
     [HttpPost]
-    public async Task<IActionResult> SaveUserData([FromBody] string userInput)
+    public async Task<IActionResult> GenerateDesign([FromBody] string userInput)
     {
         try
         {
-            var response = await galleryService.GenerateEmbeddingsAndSaveAsync(userInput);
-
-            return Ok(response);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { message = "Error saving user input", error = ex.Message });
-        }
-    }
-    
-    [HttpPost("{id}")]
-    public async Task<IActionResult> GenerateDesignDetails(string id)
-    {
-        try
-        {
-            var response = await galleryService.GenerateDesignDetailsAsync(id);
+            var response = await galleryService.GenerateDesignAsync(userInput);
 
             return Ok(response);
         }
@@ -52,8 +37,8 @@ public class GalleryController(IGalleryService galleryService) : Controller
         }
     }
     
-    [HttpGet("cache/{userInput}")]
-    public async Task<IActionResult> SearchCachedDesigns(string userInput)
+    [HttpGet("similar/{userInput}")]
+    public async Task<IActionResult> SearchSimilarDesigns(string userInput)
     {
         try
         {
