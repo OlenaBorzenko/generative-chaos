@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import TorusCanvas from '../components/TorusCanvas.tsx';
-//import RelatedPreview from './components/RelatedPreview.tsx';
 
 const defaultConfig = {
   p: 3,

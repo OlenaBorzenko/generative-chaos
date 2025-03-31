@@ -11,7 +11,7 @@ public class GalleryService : IGalleryService
 {
     private readonly CosmosDbService _cosmosDbService;
     private readonly SemanticKernelService _semanticKernelService;
-    private readonly double _cacheSimilarityScore;
+    private readonly double _similarityScore;
     private readonly int _designsMaxResults;
     
     public GalleryService(CosmosDbService cosmosDbService, SemanticKernelService semanticKernelService, IOptions<Gallery> chatOptions)
@@ -19,10 +19,10 @@ public class GalleryService : IGalleryService
         _cosmosDbService = cosmosDbService;
         _semanticKernelService = semanticKernelService;
 
-        var cacheSimilarityScore = chatOptions.Value.CacheSimilarityScore;
+        var similarityScore = chatOptions.Value.CacheSimilarityScore;
         var designsMaxResults = chatOptions.Value.DesignsMaxResults;
 
-        _cacheSimilarityScore = double.TryParse(cacheSimilarityScore, out _cacheSimilarityScore) ? _cacheSimilarityScore : 0.95;
+        _similarityScore = double.TryParse(similarityScore, out _similarityScore) ? _similarityScore : 0.65;
         _designsMaxResults = int.TryParse(designsMaxResults, out _designsMaxResults) ? _designsMaxResults: 10;
     }
     
@@ -31,6 +31,9 @@ public class GalleryService : IGalleryService
         var embeddings = await _semanticKernelService.GetEmbeddingsAsync(userInput);
         
         var (description, config) = await _semanticKernelService.GenerateDesignConfigurationAsync(userInput);
+        
+        config.EnableElectricity = false;
+        config.LumpOffset = 0;
         
         var serialisedConfig = JsonSerializer.Serialize(config);
         
@@ -45,7 +48,7 @@ public class GalleryService : IGalleryService
     {
         var vectors = await _semanticKernelService.GetEmbeddingsAsync(userInput);
         
-        var cacheItems = await _cosmosDbService.GetSimilarAsync(vectors, _cacheSimilarityScore);
+        var cacheItems = await _cosmosDbService.GetSimilarAsync(vectors, _similarityScore);
 
         return cacheItems.Select(x => new DesignDto
         {

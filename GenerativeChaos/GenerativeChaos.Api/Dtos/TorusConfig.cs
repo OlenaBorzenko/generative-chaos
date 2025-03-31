@@ -19,9 +19,9 @@ public record TorusConfig
 
     public int Lumps { get; init; }
     public double LumpHeight { get; init; }
-    public double LumpOffset { get; init; }
+    public double LumpOffset { get; set; }
 
-    public bool EnableElectricity { get; init; }
+    public bool EnableElectricity { get; set; }
     public double ElectricityStrength { get; init; }
     public int ElectricityFreq { get; init; }
 

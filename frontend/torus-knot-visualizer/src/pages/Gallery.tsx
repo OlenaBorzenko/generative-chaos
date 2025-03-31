@@ -43,7 +43,7 @@ export default function Gallery() {
               {isExpanded ? (
                 <TorusCanvas
                   config={item.torusConfig}
-                  scale={100}
+                  scale={80}
                   width={300}
                   height={300}
                 />

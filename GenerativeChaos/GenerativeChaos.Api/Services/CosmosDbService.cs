@@ -74,7 +74,7 @@ public class CosmosDbService
 
         var queryDef = new QueryDefinition(query: queryText)
             .WithParameter("@vectors", vectors)
-            .WithParameter("@similarityScore", 0.8);
+            .WithParameter("@similarityScore", similarityScore);
 
         using FeedIterator<Design> resultSet = _designContainer.GetItemQueryIterator<Design>(queryDef);
 
