@@ -26,7 +26,7 @@ export default function TorusCanvas({ config, scale = 200, width = 800, height =
         s.background(bgColor);
         s.noLoop();
 
-        computeKnotPath();
+        compteKnotPath();
         computeRingsWithParallelTransport();
 
         s.rotateX(s.HALF_PI * 2);
@@ -36,7 +36,7 @@ export default function TorusCanvas({ config, scale = 200, width = 800, height =
         drawWireframe();
       };
 
-      const computeKnotPath = () => {
+      const compteKnotPath = () => {
         const { p, q, pathDetail, knotRadius, waveAmplitude } = config;
 
         knotPoints = [];
