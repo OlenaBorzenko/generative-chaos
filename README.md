@@ -7,3 +7,5 @@ In this session, I’ll share how I’ve been experimenting with Azure Cosmos DB
 I’ll show you how AI can analyze moods, themes, and colors to generate structured art descriptions and select the right visualization techniques—turning simple inputs into generative art with p5.js. This is not about business dashboards or optimizing queries but about seeing technology differently, where code meets creativity.
 
 Whether you're a developer, an artist, or just curious about using AI and Azure Cosmos DB beyond its usual use cases—be it for creative coding, generative art, or something entirely new—this session offers a different perspective. No heavy theory—just hands-on examples, creative ideas, experiments, and lots of coding.
+
+Adding new feature
