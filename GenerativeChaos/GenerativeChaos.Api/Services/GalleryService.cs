@@ -22,18 +22,15 @@ public class GalleryService : IGalleryService
         var similarityScore = chatOptions.Value.CacheSimilarityScore;
         var designsMaxResults = chatOptions.Value.DesignsMaxResults;
 
-        _similarityScore = double.TryParse(similarityScore, out _similarityScore) ? _similarityScore : 0.65;
+        _similarityScore = double.TryParse(similarityScore, out _similarityScore) ? _similarityScore : 0.75;
         _designsMaxResults = int.TryParse(designsMaxResults, out _designsMaxResults) ? _designsMaxResults: 10;
     }
     
-    public async Task<TorusConfig> GenerateDesignAsync(string userInput)
+    public async Task<DesignDto> GenerateDesignAsync(string userInput)
     {
         var embeddings = await _semanticKernelService.GetEmbeddingsAsync(userInput);
         
         var (description, config) = await _semanticKernelService.GenerateDesignConfigurationAsync(userInput);
-        
-        config.EnableElectricity = false;
-        config.LumpOffset = 0;
         
         var serialisedConfig = JsonSerializer.Serialize(config);
         
@@ -41,7 +38,13 @@ public class GalleryService : IGalleryService
         
         await _cosmosDbService.InsertDesignAsync(design);
 
-        return config;
+        return new DesignDto
+        {
+            id = design.id, 
+            Description = design.GeneratedDescription,
+            TorusConfig = config,
+            UserInput = design.UserInput
+        };
     }
 
     public async Task<List<DesignDto>> SearchSimilarDesignsAsync(string userInput)
