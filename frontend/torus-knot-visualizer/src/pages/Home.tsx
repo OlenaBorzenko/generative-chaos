@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import TorusCanvas from '../components/TorusCanvas.tsx';
+import { savePreviewImage } from '../utils/savePreviewImage.ts';
 
 const defaultConfig = {
   p: 3,
@@ -21,13 +22,13 @@ const defaultConfig = {
   electricityFreq: 2,
   bgColor: "rgb(15, 25, 45)",
   fillColor: "rgba(223, 103, 48, 0.75)",
-   wireColor: "rgb(255, 255, 255)"
+  wireColor: "rgb(255, 255, 255)"
 };
 
 export default function Home() {
   const [input, setInput] = useState('');
   const [similarDesigns, setSimilarDesigns] = useState([]);
-  const [newDesign, setNewDesign] = useState(null);
+  const [newDesign, setNewDesign] = useState({torusConfig: defaultConfig, id:''});
   const [loading, setLoading] = useState(false);
   
   const handleSubmit = async () => {
@@ -35,23 +36,27 @@ export default function Home() {
   
     setLoading(true);
     setSimilarDesigns([]);
-    setNewDesign(null);
   
     try {
-      const [similarRes, generateRes] = await Promise.all([
-        fetch(`http://localhost:5018/api/Gallery/similar/${encodeURIComponent(input)}`),
-        fetch(`http://localhost:5018/api/Gallery`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(input)
-        })
-      ]);
-  
-      const similarData = await similarRes.json();
-      const generatedData = await generateRes.json();
-  
-      setSimilarDesigns(similarData);
-      setNewDesign(generatedData);
+      const similarPromise = fetch(`http://localhost:5018/api/Gallery/similar/${encodeURIComponent(input)}`);
+      const generatePromise = fetch(`http://localhost:5018/api/Gallery`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(input),
+      });
+
+      similarPromise
+        .then(res => res.json())
+        .then(data => setSimilarDesigns(data))
+        .catch(err => console.error('Similar fetch failed', err));
+
+      try {
+        const generateRes = await generatePromise;
+        const generatedData = await generateRes.json();
+        setNewDesign(generatedData);
+      } catch (err) {
+        console.error('Generation failed', err);
+      }
     } catch (err) {
       console.error('Error fetching designs:', err);
     } finally {
@@ -80,7 +85,7 @@ export default function Home() {
         {/* Right Panel */}
         <div style={{ width: '70%', padding: '1rem', boxSizing: 'border-box' }}>
           {newDesign ? (
-            <TorusCanvas config={newDesign} />
+            <TorusCanvas config={newDesign.torusConfig} id={newDesign.id}/>
           ) : (
             <TorusCanvas config={defaultConfig} />
           )}
@@ -102,6 +107,7 @@ export default function Home() {
             <div key={idx}>
               <TorusCanvas
                 config={(cfg as any).torusConfig}
+                id={(cfg as any).id}
                 scale={100}
                 width={400}
                 height={400}

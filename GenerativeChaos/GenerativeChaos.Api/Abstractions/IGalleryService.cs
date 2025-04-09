@@ -4,7 +4,7 @@ namespace GenerativeChaos.Api.Abstractions;
 
 public interface IGalleryService
 {
-    Task<TorusConfig> GenerateDesignAsync(string userInput);
+    Task<DesignDto> GenerateDesignAsync(string userInput);
 
     Task<List<DesignDto>> SearchSimilarDesignsAsync(string userInput);
 
