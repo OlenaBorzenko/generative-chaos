@@ -41,6 +41,28 @@ public class GalleryController(IGalleryService galleryService, BlobServiceClient
         return Ok(new { message = "Preview uploaded", url = blobClient.Uri });
     }
     
+    [HttpGet("previews")]
+    public async Task<IActionResult> GetPreviews([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+    {
+        var container = blobServiceClient.GetBlobContainerClient(_containerName);
+        var blobs = container.GetBlobsAsync();
+
+        var allBlobs = new List<string>();
+        await foreach (var blob in blobs)
+        {
+            var uri = container.GetBlobClient(blob.Name).Uri.ToString();
+            allBlobs.Add(uri);
+        }
+
+        var paged = allBlobs
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
+
+        return Ok(paged);
+    }
+
+    
     [HttpGet]
     public async Task<IActionResult> GetDesignsPage()
     {

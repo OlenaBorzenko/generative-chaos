@@ -1,5 +1,5 @@
 export async function savePreviewImage(designId: string) {
-  const canvas = document.querySelector('canvas') as HTMLCanvasElement;
+  const canvas = document.querySelector(`canvas[id="${designId}"]`) as HTMLCanvasElement;
   if (!canvas) return console.error('Canvas not found!');
 
   // Convert to blob (PNG)

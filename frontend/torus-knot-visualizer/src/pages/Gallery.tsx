@@ -1,76 +1,41 @@
 import { useEffect, useState } from 'react';
-import TorusCanvas from '../components/TorusCanvas';
 
 export default function Gallery() {
-  const [designs, setDesigns] = useState([]);
-  const [expandedIndices, setExpandedIndices] = useState<Set<number>>(new Set());
+  const [images, setImages] = useState<string[]>([]);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const pageSize = 10;
 
   useEffect(() => {
-    const fetchAll = async () => {
-      const res = await fetch('http://localhost:5018/api/Gallery');
-      const data = await res.json();
-      setDesigns(data);
-    };
+    loadImages(page);
+  }, [page]);
 
-    fetchAll();
-  }, []);
+  async function loadImages(page: number) {
+    const res = await fetch(`http://localhost:5018/api/Gallery/previews?page=${page}&pageSize=${pageSize}`);
+    const data = await res.json();
+    if (data.length < pageSize) setHasMore(false);
+    setImages(prev => [...prev, ...data]);
+  }
 
-  const handleClick = (index: number) => {
-    setExpandedIndices((prev) => new Set(prev).add(index));
-  };
+  function handleLoadMore() {
+    if (hasMore) setPage(prev => prev + 1);
+  }
 
   return (
-    <div style={{ padding: '2rem' }}>
-      <h2 style={{ marginBottom: '1rem' }}>Gallery</h2>
-
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, 300px)',
-          gap: '1rem',
-          justifyContent: 'space-between',
-        }}
-      >
-        {designs.map((item: any, idx: number) => {
-          const isExpanded = idx < 2 || expandedIndices.has(idx);
-
-          return (
-            <div 
-              key={idx} 
-              onClick={() => !isExpanded && handleClick(idx)} 
-              style={{ cursor: isExpanded ? 'default' : 'pointer', textAlign: 'center' }}
-            >
-              {isExpanded ? (
-                <TorusCanvas
-                  config={item.torusConfig}
-                  scale={80}
-                  width={300}
-                  height={300}
-                />
-              ) : (
-                <div
-                  style={{
-                    width: 300,
-                    height: 300,
-                    backgroundColor: '#111',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#aaa',
-                    border: '1px solid #333',
-                  }}
-                >
-                  Click to Load
-                </div>
-              )}
-
-              <div style={{ fontSize: '0.85rem', marginTop: '0.5rem' }}>
-                {item.userInput}
-              </div>
-            </div>
-          )
-        })}
+    <div style={{ padding: '1rem' }}>
+      <h2>Gallery</h2>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem' }}>
+        {images.map((url, idx) => (
+          <div key={idx}>
+            <img src={url} alt={`Preview ${idx}`} style={{ width: '100%' }} />
+          </div>
+        ))}
       </div>
+      {hasMore && (
+        <button onClick={handleLoadMore} style={{ marginTop: '1rem' }}>
+          Load More
+        </button>
+      )}
     </div>
   );
 }

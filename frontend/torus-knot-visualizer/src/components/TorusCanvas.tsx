@@ -10,7 +10,7 @@ interface TorusKnotProps {
   height?: number;
 }
 
-export default function TorusCanvas({ config, id = '', scale = 280, width = 900, height = 900 }: TorusKnotProps) {
+export default function TorusCanvas({ config, id = '', scale = 250, width = 800, height = 800 }: TorusKnotProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const p5InstanceRef = useRef<p5 | null>(null);
 
@@ -23,7 +23,10 @@ export default function TorusCanvas({ config, id = '', scale = 280, width = 900,
       let ringPoints: p5.Vector[][] = [];
 
       s.setup = () => {
-        s.createCanvas(width, height, s.WEBGL);
+        const canvas = s.createCanvas(width, height, s.WEBGL);
+        if (id) {
+          canvas.id(id);
+        }
         s.ortho(-width / 2, width / 2, -height / 2, height / 2, -1000, 1000);
         s.background(bgColor);
         s.noLoop();
@@ -211,7 +214,7 @@ export default function TorusCanvas({ config, id = '', scale = 280, width = 900,
     return () => {
       p5InstanceRef.current?.remove();
     };
-  }, [config, width, height]);
+  }, [config, width, height, id]);
 
   return <div ref={containerRef}></div>;
 }
