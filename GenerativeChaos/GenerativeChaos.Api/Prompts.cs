@@ -29,6 +29,7 @@ public static class Prompts
 
         Additional Rules:
         - p and q must be **prime numbers**, not equal, and p < q
+        - enableElectricity set to false will give smoother results. When set to true line will look distorted.
         - twistDirection must be **exactly 1 or -1** (negative often gives elegant folds)
         - Adjust values to avoid shape overlap or deformation:
           - If knotRadius > 0.9, reduce tubeRadius
