@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import MainView from './pages/Home';
 import Gallery from './pages/Gallery';
+import DesignDetail from './pages/Design';
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
       <Routes>
         <Route path="/" element={<MainView />} />
         <Route path="/gallery" element={<Gallery />} />
+        <Route path="/design/:id" element={<DesignDetail />} />
       </Routes>
     </Router>
   );

@@ -1,6 +1,6 @@
 namespace GenerativeChaos.Api.Options;
 
-public record AzureStorage
+public record FileStorage
 {
     public required string ConnectionString { get; init; }
 

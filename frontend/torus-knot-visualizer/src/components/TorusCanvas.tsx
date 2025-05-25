@@ -1,6 +1,7 @@
 import { useRef, useEffect } from 'react';
 import p5 from 'p5';
 import { savePreviewImage } from '../utils/savePreviewImage';
+import { export3dObject } from '../utils/exportSVG';
 
 interface TorusKnotProps {
   config: any;
@@ -44,7 +45,7 @@ export default function TorusCanvas({ config, id = '', scale = 250, width = 800,
           savePreviewImage(id);
         }
         //s.saveCanvas('torus-knot', 'png');
-        //export3dObject(ringPoints);
+        export3dObject(ringPoints);
       };
 
       function downloadSVG(svgString: string, filename = 'torus-knot.svg') {

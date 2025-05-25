@@ -62,16 +62,26 @@ public class GalleryService : IGalleryService
         }).ToList();
     }
 
-    public async Task<List<DesignDto>> GetDesignsPageAsync()
+    public async Task<List<DesignDto>> GetDesignsPageAsync(int skip = 0, int take = 10)
     {
-        var designs = await _cosmosDbService.GetDesignsAsync();
-        
+        var designs = await _cosmosDbService.GetDesignsRangeAsync(skip, take);
+
         return designs.Select(x => new DesignDto
         {
-            id = x.id, 
+            id = x.id,
+            PreviewUrl = x.PreviewUrl,
             Description = x.GeneratedDescription,
             TorusConfig = JsonSerializer.Deserialize<TorusConfig>(x.TorusConfig),
             UserInput = x.UserInput
-        }).ToList();;
+        }).ToList();
+    }
+
+    public async Task UpdateDesignPreviewUrlAsync(string designId, string url)
+    {
+        var design = await _cosmosDbService.GetDesignAsync(designId);
+
+        design.PreviewUrl = url;
+
+        await _cosmosDbService.UpdateDesignAsync(design);
     }
 }
