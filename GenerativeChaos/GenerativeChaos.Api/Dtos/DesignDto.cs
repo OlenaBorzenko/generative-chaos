@@ -8,5 +8,7 @@ public record DesignDto
     
     public string? Description { get; set; }
     
+    public string? PreviewUrl { get; set; }
+    
     public TorusConfig? TorusConfig { get; set; }
 }

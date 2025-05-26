@@ -77,20 +77,9 @@ public class SemanticKernelService
 
         var artConfig = Prompts.DefaultConfig;
         
-        try
-        {
-            var options = new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            };
-            
-            var output = JsonSerializer.Deserialize<TorusConfig>(configResult.ToString(), options);
-            artConfig = output ?? artConfig;
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-        }
+        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+        var output = JsonSerializer.Deserialize<TorusConfig>(configResult.ToString(), options);
+        artConfig = output ?? artConfig;
         
         return (description, artConfig);
     }

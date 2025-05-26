@@ -1,18 +1,17 @@
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
-import MainView from './pages/Home';
-import Gallery from './pages/Gallery';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import MainView from './pages/home/Home';
+import Gallery from './pages/gallery/Gallery';
+import DesignDetail from './pages/design/Design';
+import NavBar from './components/header/NavBar';
 
 function App() {
   return (
     <Router>
-      <nav style={{ padding: '1rem', display: 'flex', gap: '1rem' }}>
-        <Link to="/">Home</Link>
-        <Link to="/gallery">Gallery</Link>
-      </nav>
-
+      <NavBar />
       <Routes>
         <Route path="/" element={<MainView />} />
         <Route path="/gallery" element={<Gallery />} />
+        <Route path="/design/:id" element={<DesignDetail />} />
       </Routes>
     </Router>
   );
