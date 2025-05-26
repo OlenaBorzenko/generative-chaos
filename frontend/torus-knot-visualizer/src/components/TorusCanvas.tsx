@@ -1,17 +1,18 @@
 import { useRef, useEffect } from 'react';
 import p5 from 'p5';
 import { savePreviewImage } from '../utils/savePreviewImage';
-import { export3dObject } from '../utils/exportSVG';
 
 interface TorusKnotProps {
   config: any;
   id?: string;
+  isAdjustmentMode?: boolean;
   scale?: number;
   width?: number;
   height?: number;
+  onGenerateObj?: (ringPoints: p5.Vector[][]) => void;
 }
 
-export default function TorusCanvas({ config, id = '', scale = 250, width = 800, height = 800 }: TorusKnotProps) {
+export default function TorusCanvas({ config, id = '', isAdjustmentMode = false, scale = 250, width = 800, height = 800, onGenerateObj }: TorusKnotProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const p5InstanceRef = useRef<p5 | null>(null);
 
@@ -41,29 +42,15 @@ export default function TorusCanvas({ config, id = '', scale = 250, width = 800,
         drawDepthFill();
         drawWireframe();
 
-        if (id !== '') {
+        if (id !== '' && !isAdjustmentMode) {
           savePreviewImage(id);
         }
-        //s.saveCanvas('torus-knot', 'png');
-        export3dObject(ringPoints);
+
+        if (onGenerateObj) {
+          onGenerateObj(ringPoints);
+        }
       };
 
-      function downloadSVG(svgString: string, filename = 'torus-knot.svg') {
-        const blob = new Blob([svgString], { type: 'image/svg+xml' });
-        const url = URL.createObjectURL(blob);
-      
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        a.style.display = 'none';
-      
-        document.body.appendChild(a);
-        a.click();
-      
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      }
-      
       const computeKnotPath = () => {
         const { p, q, pathDetail, knotRadius, waveAmplitude } = config;
 
@@ -215,7 +202,7 @@ export default function TorusCanvas({ config, id = '', scale = 250, width = 800,
     return () => {
       p5InstanceRef.current?.remove();
     };
-  }, [config, width, height, id]);
+  }, [config, width, height, id, isAdjustmentMode]);
 
   return <div ref={containerRef}></div>;
 }

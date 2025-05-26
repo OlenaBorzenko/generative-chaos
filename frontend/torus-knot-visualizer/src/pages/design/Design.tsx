@@ -1,62 +1,74 @@
-import { useParams, useLocation } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import TorusCanvas from '../../components/TorusCanvas';
 import s from './Design.module.css';
-
-type Config = {
-  p: number;
-  q: number;
-  ringDetail: number;
-  pathDetail: number;
-  tubeRadius: number;
-  knotRadius: number;
-  waveAmplitude: number;
-  eccentricity: number;
-  twistTurns: number;
-  globalTwistTurns: number;
-  twistDirection: number;
-  lumps: number;
-  lumpHeight: number;
-  lumpOffset: number;
-  enableElectricity: boolean;
-  electricityStrength: number;
-  electricityFreq: number;
-  bgColor: string;
-  fillColor: string;
-  wireColor: string;
-};
+import useStore from '../../store/useStore';
+import { export3dObject } from '../../utils/export3dObject';
+import p5 from 'p5';
 
 export default function DesignDetail() {
-  const { id } = useParams();
-  const location = useLocation();
-  const design = location.state?.design;
-  const [config, setConfig] = useState<Config>(design.torusConfig || {});
+  const { selectedDesign, setSelectedDesign } = useStore();
+  const [design, setDesign] = useState(selectedDesign);
+  const [isAdjustmentMode, setAdjustmentMode] = useState(true);
+  const [ringPoints, setRingPoints] = useState<p5.Vector[][] | null>(null);
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const { name, value } = e.target;
-    setConfig(prev => ({
+  useEffect(() => {
+    setDesign(selectedDesign);
+  }, [selectedDesign]);
+
+  const setConfig = (updateFn: any) => {
+    setAdjustmentMode(true);
+    const updatedConfig = updateFn(design.torusConfig);
+    setDesign(prev => ({
       ...prev,
-      [name]: Number(value),
+      torusConfig: updatedConfig,
     }));
-  }
+  };
+
+  const saveDesign = () => {
+    setAdjustmentMode(false);
+    setSelectedDesign(design);
+  };
+
+  const resetDesign = () => {
+    setDesign(selectedDesign);
+  };
+
+  const handleGenerateObj = (points: p5.Vector[][]) => {
+    setRingPoints(points);
+  };
+
+  const downloadObj = () => {
+    if (ringPoints) {
+      export3dObject(ringPoints);
+    } else {
+      console.error('Ring points are not available yet.');
+    }
+  };
 
   return (
-    <div className={s.root}>
-      <div className={s.sidebar}>
-        <h3 className={s.heading}>Adjust Torus Knot</h3>
+    <div className={s.container}>
+      <div className={s.leftPanel}>
+        <div className={s.visualization}>
+          <TorusCanvas
+            config={design.torusConfig} 
+            id={design.id}
+            isAdjustmentMode={isAdjustmentMode}
+            onGenerateObj={handleGenerateObj}
+          />  
+        </div>
+      </div>
+      <div className={s.rightPanel}>
         <div className={s.controlsGrid}>
-          {Object.entries(config).map(([key, val]) => (
+          {Object.entries(design.torusConfig).map(([key, val]) => (
             <div key={key} className={s.control}>
-              <label className={s.label}>
-                {key.replace(/([A-Z])/g, ' $1')}
-              </label>
+              <label className={s.label}>{key.replace(/([A-Z])/g, ' $1')}</label>
               {typeof val === 'boolean' ? (
                 <input
                   type="checkbox"
                   name={key}
                   checked={val}
                   onChange={e =>
-                    setConfig(prev => ({
+                    setConfig((prev: any) => ({
                       ...prev,
                       [key]: e.target.checked,
                     }))
@@ -64,39 +76,53 @@ export default function DesignDetail() {
                   className={s.checkbox}
                 />
               ) : key.toLowerCase().includes('color') ? (
-                <input
-                  type="color"
-                  name={key}
-                  value={val}
-                  onChange={e =>
-                    setConfig(prev => ({
-                      ...prev,
-                      [key]: e.target.value,
-                    }))
-                  }
-                  className={s.colorInput}
-                />
+                <div className={s.colorInputContainer}>
+                  <div
+                    className={s.colorPreview}
+                    style={{ backgroundColor: String(val) }}
+                  ></div>
+                  <input
+                    type="color"
+                    name={key}
+                    value={val}
+                    onChange={e =>
+                      setConfig((prev: any) => ({
+                        ...prev,
+                        [key]: e.target.value,
+                      }))
+                    }
+                    className={s.colorInput}
+                  />
+                </div>
               ) : (
                 <input
                   type="number"
                   name={key}
                   value={val}
                   onChange={e =>
-                    setConfig(prev => ({
+                    setConfig((prev: any) => ({
                       ...prev,
                       [key]: Number(e.target.value),
                     }))
                   }
-                  step="any"
+                  step="0.1"
                   className={s.numberInput}
                 />
               )}
             </div>
           ))}
         </div>
-      </div>
-      <div className={s.visual}>
-        <TorusCanvas config={config} id={id as string} width={900} height={900} />
+        <div className={s.buttonGroup}>
+          <button onClick={saveDesign} className={s.saveButton}>
+            Save
+          </button>
+          <button onClick={resetDesign} className={s.resetButton}>
+            Reset
+          </button>
+          <button onClick={downloadObj} className={s.downloadButton}>
+            Download OBJ
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -81,3 +81,17 @@
   border-top: 0.5px solid #000000;
   margin: 1rem 0;
 }
+
+.buttonGroup {
+  display: flex;
+  gap: 1rem;
+}
+
+.buttonGroup button {
+  flex: 1;
+}
+
+.buttonGroup button:only-child {
+  flex: none;
+  width: 100%;
+}
