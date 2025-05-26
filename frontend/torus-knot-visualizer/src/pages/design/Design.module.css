@@ -1,0 +1,88 @@
+/* Design.module.css - Styles for the Design page */
+
+.root {
+  display: flex;
+  height: 100vh;
+  padding: 2rem;
+  background: var(--design-bg, #242424);
+}
+
+.sidebar {
+  flex: 1;
+  margin-right: 2rem;
+  background: var(--design-panel-bg, #181a20);
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+  padding: 2rem;
+  min-width: 340px;
+  max-width: 40%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.heading {
+  margin-bottom: 1rem;
+  text-align: center;
+  color: var(--design-heading, #f5f6fa);
+}
+
+.controlsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem 1.5rem;
+}
+
+.control {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.label {
+  margin-bottom: 4px;
+  text-transform: capitalize;
+  color: var(--design-label, #bfc9d1);
+}
+
+.checkbox {
+  transform: scale(1.2);
+}
+
+.colorInput {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: none;
+  padding: 0;
+}
+
+.numberInput {
+  width: 100%;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #444;
+  font-size: 15px;
+  background: #23272f;
+  color: #f5f6fa;
+}
+
+.visual {
+  flex: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 900px) {
+  .root {
+    flex-direction: column;
+    height: auto;
+    padding: 1rem;
+  }
+  .sidebar {
+    margin-right: 0;
+    margin-bottom: 1.5rem;
+    max-width: 100%;
+  }
+}

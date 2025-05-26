@@ -57,6 +57,7 @@ public class GalleryService : IGalleryService
         {
             id = x.id, 
             Description = x.GeneratedDescription,
+            PreviewUrl = x.PreviewUrl,
             TorusConfig = JsonSerializer.Deserialize<TorusConfig>(x.TorusConfig),
             UserInput = x.UserInput
         }).ToList();

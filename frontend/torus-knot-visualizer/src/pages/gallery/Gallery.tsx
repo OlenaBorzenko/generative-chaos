@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // Add this import
+import s from './Gallery.module.css';
 
 type Design = {
   id: string | number;
   previewUrl: string;
-  // add other properties if needed
+  userInput: string;
 };
 
 export default function Gallery() {
@@ -12,7 +13,7 @@ export default function Gallery() {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const pageSize = 10;
-  const navigate = useNavigate(); // Add this line
+  const navigate = useNavigate();
 
   useEffect(() => {
     loadDesigns(page);
@@ -30,21 +31,21 @@ export default function Gallery() {
   }
 
   return (
-    <div style={{ padding: '1rem' }}>
-      <h2>Gallery</h2>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem' }}>
+    <div className={s.container}>
+      <div className={s.galleryGrid}>
         {designs.map((design, idx) => (
           <div
             key={design.id ?? idx}
-            style={{ cursor: 'pointer' }}
+            className={s.gridItem}
             onClick={() => navigate(`/design/${design.id}`, { state: { design } })} // Add navigation on click
           >
-            <img src={design.previewUrl} alt={`Preview ${idx}`} style={{ width: '100%' }} />
+            <img src={design.previewUrl} alt={`Preview ${idx}`} className={s.gridImage} />
+            <div className={s.imageTitle}>"{design.userInput}"</div> {/* Add title under the image */}
           </div>
         ))}
       </div>
       {hasMore && (
-        <button onClick={handleLoadMore} style={{ marginTop: '1rem' }}>
+        <button onClick={handleLoadMore} className={s.galleryButton}>
           Load More
         </button>
       )}

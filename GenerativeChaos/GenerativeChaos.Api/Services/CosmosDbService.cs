@@ -63,8 +63,8 @@ public class CosmosDbService
         var result = new List<Design>();
 
         const string queryText = $"""
-                                  SELECT Top 5 
-                                      c.id, c.userInput, c.generatedDescription, c.torusConfig, VectorDistance(c.vectors, @vectors) as similarityScore
+                                  SELECT Top 10 
+                                      c.id, c.userInput, c.generatedDescription, c.torusConfig, c.previewUrl, VectorDistance(c.vectors, @vectors) as similarityScore
                                   FROM c  
                                   WHERE 
                                       VectorDistance(c.vectors, @vectors) > @similarityScore 

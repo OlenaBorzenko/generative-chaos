@@ -1,6 +1,7 @@
 import { useParams, useLocation } from 'react-router-dom';
 import { useState } from 'react';
-import TorusCanvas from '../components/TorusCanvas';
+import TorusCanvas from '../../components/TorusCanvas';
+import s from './Design.module.css';
 
 type Config = {
   p: number;
@@ -40,13 +41,15 @@ export default function DesignDetail() {
   }
 
   return (
-    <div style={{ display: 'flex', height: '100vh', padding: '2rem' }}>
-      <div style={{ flex: 1, marginRight: '2rem' }}>
-        <h3>Adjust Torus Knot</h3>
-        {Object.entries(config).map(([key, val]) => (
-          <div key={key} style={{ marginBottom: '1rem' }}>
-            <label>
-              {key}:&nbsp;
+    <div className={s.root}>
+      <div className={s.sidebar}>
+        <h3 className={s.heading}>Adjust Torus Knot</h3>
+        <div className={s.controlsGrid}>
+          {Object.entries(config).map(([key, val]) => (
+            <div key={key} className={s.control}>
+              <label className={s.label}>
+                {key.replace(/([A-Z])/g, ' $1')}
+              </label>
               {typeof val === 'boolean' ? (
                 <input
                   type="checkbox"
@@ -58,6 +61,7 @@ export default function DesignDetail() {
                       [key]: e.target.checked,
                     }))
                   }
+                  className={s.checkbox}
                 />
               ) : key.toLowerCase().includes('color') ? (
                 <input
@@ -70,6 +74,7 @@ export default function DesignDetail() {
                       [key]: e.target.value,
                     }))
                   }
+                  className={s.colorInput}
                 />
               ) : (
                 <input
@@ -83,13 +88,14 @@ export default function DesignDetail() {
                     }))
                   }
                   step="any"
+                  className={s.numberInput}
                 />
               )}
-            </label>
-          </div>
-        ))}
+            </div>
+          ))}
+        </div>
       </div>
-      <div style={{ flex: 2, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div className={s.visual}>
         <TorusCanvas config={config} id={id as string} width={900} height={900} />
       </div>
     </div>
