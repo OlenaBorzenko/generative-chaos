@@ -3,6 +3,9 @@ import TorusCanvas from '../../components/TorusCanvas';
 import s from './Design.module.css';
 import useStore from '../../store/useStore';
 import { export3dObject } from '../../utils/export3dObject';
+import { exportFbxObject } from '../../utils/exportFbxObject';
+import { saveLinesAsSvg } from '../../utils/saveLinesAsSvg';
+import { projectTorusKnot } from '../../utils/projectTorusKnot';
 import p5 from 'p5';
 
 export default function DesignDetail() {
@@ -10,6 +13,7 @@ export default function DesignDetail() {
   const [design, setDesign] = useState(selectedDesign);
   const [isAdjustmentMode, setAdjustmentMode] = useState(true);
   const [ringPoints, setRingPoints] = useState<p5.Vector[][] | null>(null);
+  const [quads, setQuads] = useState<[p5.Vector, p5.Vector, p5.Vector, p5.Vector][] | null>(null); // New state for quads
 
   useEffect(() => {
     setDesign(selectedDesign);
@@ -33,17 +37,39 @@ export default function DesignDetail() {
     setDesign(selectedDesign);
   };
 
-  const handleGenerateObj = (points: p5.Vector[][]) => {
+  const handleGenerateObj = (points: p5.Vector[][], quadsData: [p5.Vector, p5.Vector, p5.Vector, p5.Vector][]) => {
     setRingPoints(points);
+    setQuads(quadsData);
   };
 
   const downloadObj = () => {
-    if (ringPoints) {
-      export3dObject(ringPoints);
+    if (ringPoints && quads) {
+      export3dObject(ringPoints, quads);
     } else {
       console.error('Ring points are not available yet.');
     }
   };
+
+  const downloadFbx = () => {
+    if (quads) {
+      exportFbxObject(quads);
+    } else {
+      console.error('Quads are not available yet.');
+    }
+  };
+
+  const downloadSvg = () => {
+  if (quads) {
+    const cameraPosition = new p5.Vector(0, 0, 500);
+    const cameraDirection = new p5.Vector(0, 0, -1);
+
+    const { lines } = projectTorusKnot(quads, cameraPosition, cameraDirection);
+
+    saveLinesAsSvg(lines, 800, 800, 'torus-knot.svg');
+  } else {
+    console.error('Quads are not available yet.');
+  }
+};
 
   return (
     <div className={s.container}>
@@ -121,6 +147,12 @@ export default function DesignDetail() {
           </button>
           <button onClick={downloadObj} className={s.downloadButton}>
             Download OBJ
+          </button>
+          <button onClick={downloadFbx} className={s.downloadButton}>
+            Download FBX
+          </button>
+          <button onClick={downloadSvg} className={s.downloadButton}>
+            Download SVG
           </button>
         </div>
       </div>
