@@ -6,6 +6,7 @@ import { export3dObject } from '../../utils/export3dObject';
 import { exportFbxObject } from '../../utils/exportFbxObject';
 import { saveLinesAsSvg } from '../../utils/saveLinesAsSvg';
 import { projectTorusKnot } from '../../utils/projectTorusKnot';
+import { exportTopViewToSVG } from '../../utils/exportTopViewToSVG';
 import p5 from 'p5';
 
 export default function DesignDetail() {
@@ -44,32 +45,19 @@ export default function DesignDetail() {
 
   const downloadObj = () => {
     if (ringPoints && quads) {
-      export3dObject(ringPoints, quads);
+      export3dObject(selectedDesign.id, ringPoints, quads);
     } else {
-      console.error('Ring points are not available yet.');
+      console.error('RingPoints or Quads are not available yet.');
     }
   };
 
   const downloadFbx = () => {
     if (quads) {
-      exportFbxObject(quads);
+      exportFbxObject(selectedDesign.id, quads);
     } else {
       console.error('Quads are not available yet.');
     }
   };
-
-  const downloadSvg = () => {
-  if (quads) {
-    const cameraPosition = new p5.Vector(0, 0, 500);
-    const cameraDirection = new p5.Vector(0, 0, -1);
-
-    const { lines } = projectTorusKnot(quads, cameraPosition, cameraDirection);
-
-    saveLinesAsSvg(lines, 800, 800, 'torus-knot.svg');
-  } else {
-    console.error('Quads are not available yet.');
-  }
-};
 
   return (
     <div className={s.container}>
@@ -150,9 +138,6 @@ export default function DesignDetail() {
           </button>
           <button onClick={downloadFbx} className={s.downloadButton}>
             Download FBX
-          </button>
-          <button onClick={downloadSvg} className={s.downloadButton}>
-            Download SVG
           </button>
         </div>
       </div>

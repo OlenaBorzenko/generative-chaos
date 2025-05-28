@@ -1,6 +1,7 @@
 import p5 from 'p5';
 
 export function exportFbxObject(
+  id: string,
   quads: [p5.Vector, p5.Vector, p5.Vector, p5.Vector][]
 ): void {
   let fbx = '';
@@ -44,7 +45,7 @@ export function exportFbxObject(
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'torus-knot.fbx';
+  a.download = `${id}.fbx`;
   a.click();
   URL.revokeObjectURL(url);
 }

@@ -126,6 +126,7 @@ export default function TorusCanvas({ config, id = '', isAdjustmentMode = false,
         }
 
         for (let i = 0; i < ringPoints.length - 1; i++) {
+          debugger;
           const ringA = ringPoints[i];
           const ringB = ringPoints[i + 1];
 

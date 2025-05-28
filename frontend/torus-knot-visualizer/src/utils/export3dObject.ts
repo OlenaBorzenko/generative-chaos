@@ -1,6 +1,7 @@
 import p5 from 'p5';
 
 export function export3dObject(
+  id: string,
   ringPoints: p5.Vector[][],
   quads?: [p5.Vector, p5.Vector, p5.Vector, p5.Vector][]
 ): any {
@@ -44,7 +45,7 @@ export function export3dObject(
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'torus-knot.obj';
+  a.download = `${id}.obj`;
   a.click();
   URL.revokeObjectURL(url);
 }
