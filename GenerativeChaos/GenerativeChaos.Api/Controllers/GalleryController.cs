@@ -1,5 +1,5 @@
-using Azure.Storage.Blobs;
 using GenerativeChaos.Api.Abstractions;
+using GenerativeChaos.Api.Dtos;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GenerativeChaos.Api.Controllers;
@@ -21,6 +21,14 @@ public class GalleryController(IGalleryService galleryService, IFileStorageServi
         {
             return BadRequest(new { message = "Error generating design details", error = ex.Message });
         }
+    }
+    
+    [HttpPut("designs/{designId}")]
+    public async Task<IActionResult> UpdateConfig(string designId, [FromBody] TorusConfig config)
+    {
+        await galleryService.UpdateDesignConfigAsync(designId, config);
+
+        return Ok(new { message = "Config updated", designId });
     }
     
     [HttpPost("preview/{designId}")]

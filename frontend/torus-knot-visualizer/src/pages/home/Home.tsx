@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import TorusCanvas from '../../components/TorusCanvas.tsx';
 import s from './Home.module.css';
 import useStore, { DesignConfig } from '../../store/useStore';
+import { savePreviewImage } from '../../utils/savePreviewImage';
 
 export default function Home() {
   const [input, setInput] = useState('');
@@ -25,6 +26,10 @@ export default function Home() {
     fetchAndSetDesigns(input);
   };
 
+  const handleSavePreviewImage = (id: string) => {
+    savePreviewImage(id);
+  };
+
   return (
     <div className={s.container}>
       <div className={s.leftPanel}>
@@ -32,6 +37,7 @@ export default function Home() {
           <TorusCanvas 
             config={newDesign.torusConfig} 
             id={newDesign.id}
+            savePreviewImage={handleSavePreviewImage}
           />
         </div>
       </div>

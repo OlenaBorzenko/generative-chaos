@@ -85,4 +85,13 @@ public class GalleryService : IGalleryService
 
         await _cosmosDbService.UpdateDesignAsync(design);
     }
+
+    public async Task UpdateDesignConfigAsync(string designId, TorusConfig config)
+    {
+        var design = await _cosmosDbService.GetDesignAsync(designId);
+
+        design.TorusConfig = JsonSerializer.Serialize(config);
+
+        await _cosmosDbService.UpdateDesignAsync(design);
+    }
 }

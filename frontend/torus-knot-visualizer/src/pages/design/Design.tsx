@@ -4,13 +4,15 @@ import s from './Design.module.css';
 import useStore from '../../store/useStore';
 import { export3dObject } from '../../utils/export3dObject';
 import { exportFbxObject } from '../../utils/exportFbxObject';
+import { savePreviewImage } from '../../utils/savePreviewImage';
+
 import { saveLinesAsSvg } from '../../utils/saveLinesAsSvg';
 import { projectTorusKnot } from '../../utils/projectTorusKnot';
 import { exportTopViewToSVG } from '../../utils/exportTopViewToSVG';
 import p5 from 'p5';
 
 export default function DesignDetail() {
-  const { selectedDesign, setSelectedDesign } = useStore();
+  const { selectedDesign, setSelectedDesign, updateDesignConfig } = useStore();
   const [design, setDesign] = useState(selectedDesign);
   const [isAdjustmentMode, setAdjustmentMode] = useState(true);
   const [ringPoints, setRingPoints] = useState<p5.Vector[][] | null>(null);
@@ -30,8 +32,9 @@ export default function DesignDetail() {
   };
 
   const saveDesign = () => {
-    setAdjustmentMode(false);
     setSelectedDesign(design);
+    setAdjustmentMode(false);
+    updateDesignConfig(design);
   };
 
   const resetDesign = () => {
@@ -41,6 +44,10 @@ export default function DesignDetail() {
   const handleGenerateObj = (points: p5.Vector[][], quadsData: [p5.Vector, p5.Vector, p5.Vector, p5.Vector][]) => {
     setRingPoints(points);
     setQuads(quadsData);
+  };
+
+  const handleSavePreviewImage = (id: string) => {
+    savePreviewImage(id);
   };
 
   const downloadObj = () => {
@@ -68,6 +75,7 @@ export default function DesignDetail() {
             id={design.id}
             isAdjustmentMode={isAdjustmentMode}
             onGenerateObj={handleGenerateObj}
+            savePreviewImage={handleSavePreviewImage}
           />  
         </div>
       </div>

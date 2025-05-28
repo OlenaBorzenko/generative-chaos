@@ -11,4 +11,6 @@ public interface IGalleryService
     Task<List<DesignDto>> GetDesignsPageAsync(int skip = 0, int take = 10);
     
     Task UpdateDesignPreviewUrlAsync(string designId, string url);
+    
+    Task UpdateDesignConfigAsync(string designId, TorusConfig config);
 }

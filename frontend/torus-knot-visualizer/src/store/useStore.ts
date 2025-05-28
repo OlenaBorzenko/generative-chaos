@@ -62,6 +62,7 @@ type StoreState = {
   setSelectedDesign: (design: DesignConfig) => void;
   setNewDesign: (design: DesignConfig) => void;
   clearState: () => void;
+  updateDesignConfig: (design: DesignConfig) => Promise<void>;
   fetchAndSetDesigns: (input: string) => Promise<void>;
 };
 
@@ -82,6 +83,20 @@ const useStore = create<StoreState>()(
         similarDesigns: [], 
         newDesign: { torusConfig: defaultConfig, id: '' } as DesignConfig 
       }),
+      updateDesignConfig: async (design: DesignConfig) => {
+        try {
+          const generatePromise = fetch(`http://localhost:5018/api/Gallery/designs/${design.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(design.torusConfig),
+          });
+
+          await generatePromise;
+
+        } catch (err) {
+          console.error('Error fetching designs:', err);
+        }
+      },
       fetchAndSetDesigns: async (input: string) => {
         set({ similarDesigns: [] });
 

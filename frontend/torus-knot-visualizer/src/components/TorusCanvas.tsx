@@ -1,6 +1,5 @@
 import { useRef, useEffect } from 'react';
 import p5 from 'p5';
-import { savePreviewImage } from '../utils/savePreviewImage';
 
 interface TorusKnotProps {
   config: any;
@@ -10,9 +9,10 @@ interface TorusKnotProps {
   width?: number;
   height?: number;
   onGenerateObj?: (ringPoints: p5.Vector[][], quads: [p5.Vector, p5.Vector, p5.Vector, p5.Vector][]) => void;
+  savePreviewImage?: (id: string) => void;
 }
 
-export default function TorusCanvas({ config, id = '', isAdjustmentMode = false, scale = 250, width = 800, height = 800, onGenerateObj }: TorusKnotProps) {
+export default function TorusCanvas({ config, id = '', isAdjustmentMode = false, scale = 250, width = 800, height = 800, onGenerateObj, savePreviewImage }: TorusKnotProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const p5InstanceRef = useRef<p5 | null>(null);
 
@@ -43,7 +43,7 @@ export default function TorusCanvas({ config, id = '', isAdjustmentMode = false,
         drawDepthFill();
         drawWireframe();
 
-        if (id !== '' && !isAdjustmentMode) {
+        if (savePreviewImage && id !== '' && !isAdjustmentMode) {
           savePreviewImage(id);
         }
 
