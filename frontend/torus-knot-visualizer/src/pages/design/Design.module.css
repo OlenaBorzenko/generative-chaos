@@ -1,0 +1,89 @@
+.container {
+  display: flex;
+  padding: 2rem;
+  flex-direction: row;
+  height: 100%;
+  color: white;
+}
+
+.leftPanel {
+  margin-right: 25px;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.rightPanel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  box-sizing: border-box;
+
+  button {
+    width: 100%;
+    margin-top: 1rem;;
+  }
+}
+
+.visualization {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 30px;
+}
+
+.controlsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* Two equal-width columns */
+  gap: 1rem;
+  align-items: center;
+}
+
+.control {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.label {
+  font-size: 1rem;
+  color: #4a4a4a;
+  text-transform: capitalize;
+  letter-spacing: 0.03em;
+}
+
+.checkbox,
+.colorInput,
+.numberInput {
+  border-radius: 8px;
+  padding: 0.5rem;
+  border: 1px solid rgb(188, 188, 188);
+  background-color: white;
+  color: black;
+}
+
+.colorInput {
+  width: 50%;
+}
+
+.checkbox:focus,
+.colorInput:focus,
+.numberInput:focus {
+  outline: none !important;
+  border: 1px solid rgb(85, 85, 85);
+}
+
+.colorPreview {
+  width: 20px;
+  height: 20px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.colorInputContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}

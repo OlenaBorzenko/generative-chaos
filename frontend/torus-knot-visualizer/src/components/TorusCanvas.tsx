@@ -3,12 +3,16 @@ import p5 from 'p5';
 
 interface TorusKnotProps {
   config: any;
+  id?: string;
+  isAdjustmentMode?: boolean;
   scale?: number;
   width?: number;
   height?: number;
+  onGenerateObj?: (ringPoints: p5.Vector[][], quads: [p5.Vector, p5.Vector, p5.Vector, p5.Vector][]) => void;
+  savePreviewImage?: (id: string) => void;
 }
 
-export default function TorusCanvas({ config, scale = 200, width = 800, height = 800 }: TorusKnotProps) {
+export default function TorusCanvas({ config, id = '', isAdjustmentMode = false, scale = 200, width = 800, height = 800, onGenerateObj, savePreviewImage }: TorusKnotProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const p5InstanceRef = useRef<p5 | null>(null);
 
@@ -19,9 +23,13 @@ export default function TorusCanvas({ config, scale = 200, width = 800, height =
       const { bgColor } = config;
       let knotPoints: p5.Vector[] = [];
       let ringPoints: p5.Vector[][] = [];
+      let quads: [p5.Vector, p5.Vector, p5.Vector, p5.Vector][] = [];
 
       s.setup = () => {
-        s.createCanvas(width, height, s.WEBGL);
+        const canvas = s.createCanvas(width, height, s.WEBGL);
+        if (id) {
+          canvas.id(id);
+        }
         s.ortho(-width / 2, width / 2, -height / 2, height / 2, -1000, 1000);
         s.background(bgColor);
         s.noLoop();
@@ -34,6 +42,14 @@ export default function TorusCanvas({ config, scale = 200, width = 800, height =
 
         drawDepthFill();
         drawWireframe();
+
+        if (savePreviewImage && id !== '' && !isAdjustmentMode) {
+          savePreviewImage(id);
+        }
+
+        if (onGenerateObj) {
+          onGenerateObj(ringPoints, quads);
+        }
       };
 
       const computeKnotPath = () => {
@@ -42,7 +58,7 @@ export default function TorusCanvas({ config, scale = 200, width = 800, height =
         knotPoints = [];
         for (let i = 0; i <= pathDetail; i++) {
           const t = s.map(i, 0, pathDetail, 0, s.TWO_PI);
-          const r = knotRadius + waveAmplitude * s.cos(q * t); // no deformation yet
+          const r = knotRadius + waveAmplitude * s.cos(q * t);
           const x = r * s.cos(p * t);
           const y = r * s.sin(p * t);
           const z = 0.5 * s.sin(q * t);
@@ -51,17 +67,16 @@ export default function TorusCanvas({ config, scale = 200, width = 800, height =
         knotPoints.push(knotPoints[0]);
       };
 
-
       const computeRingsWithParallelTransport = () => {
         const {
           ringDetail, tubeRadius, twistDirection, twistTurns, globalTwistTurns,
           lumps, lumpHeight, lumpOffset, eccentricity, pathDetail, enableElectricity, electricityStrength, electricityFreq
         } = config;
-
         let up = s.createVector(0, 1, 0);
         let prevNormal: p5.Vector | null = null;
         let prevTangent: p5.Vector | null = null;
         ringPoints = [];
+        quads = [];
 
         for (let i = 0; i < knotPoints.length - 1; i++) {
           let p1 = knotPoints[i];
@@ -73,7 +88,6 @@ export default function TorusCanvas({ config, scale = 200, width = 800, height =
             normal = tangent.copy().cross(up).normalize();
           } else {
             const axis = prevTangent!.copy().cross(tangent);
-            //const angle = p5.Vector.angleBetween(prevTangent!, tangent);
             const angle = s.acos(p5.Vector.dot(prevTangent as p5.Vector, tangent));
             normal = rotateVectorAroundAxis(prevNormal!, axis.normalize(), angle);
           }
@@ -105,10 +119,38 @@ export default function TorusCanvas({ config, scale = 200, width = 800, height =
 
             ring.push(p5.Vector.add(p1, offset));
           }
-      
+
           ringPoints.push(ring);
           prevNormal = normal;
           prevTangent = tangent;
+        }
+
+        for (let i = 0; i < ringPoints.length - 1; i++) {
+          const ringA = ringPoints[i];
+          const ringB = ringPoints[i + 1];
+
+          for (let j = 0; j < ringDetail; j++) {
+            const quad: [p5.Vector, p5.Vector, p5.Vector, p5.Vector] = [
+              ringA[j],
+              ringA[(j + 1) % ringDetail],
+              ringB[(j + 1) % ringDetail],
+              ringB[j],
+            ];
+
+            if (
+              quad[0].equals(quad[1]) ||
+              quad[0].equals(quad[2]) ||
+              quad[0].equals(quad[3]) ||
+              quad[1].equals(quad[2]) ||
+              quad[1].equals(quad[3]) ||
+              quad[2].equals(quad[3])
+            ) {
+              console.error('Degenerate quad detected during generation:', quad);
+              continue;
+            }
+
+            quads.push(quad);
+          }
         }
       
         ringPoints.push(ringPoints[0]);
@@ -187,7 +229,7 @@ export default function TorusCanvas({ config, scale = 200, width = 800, height =
     return () => {
       p5InstanceRef.current?.remove();
     };
-  }, [config, width, height]);
+  }, [config, width, height, id, isAdjustmentMode]);
 
   return <div ref={containerRef}></div>;
 }

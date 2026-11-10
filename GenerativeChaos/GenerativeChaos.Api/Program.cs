@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Azure.Identity;
+using Azure.Storage.Blobs;
 using GenerativeChaos.Api;
 using GenerativeChaos.Api.Abstractions;
 using Microsoft.Extensions.Options;
@@ -50,6 +51,12 @@ if (openAIEndpoint is null)
     throw new ArgumentException($"{nameof(IOptions<OpenAi>)} was not resolved through dependency injection.");
 }
 
+builder.Services.AddSingleton<BlobServiceClient>(sp =>
+{
+    var options = sp.GetRequiredService<IOptions<FileStorage>>().Value;
+    return new BlobServiceClient(options.ConnectionString);
+});
+
 builder.AddAzureOpenAIClient("openAiConnectionName",
     configureSettings: settings =>
     {
@@ -82,6 +89,9 @@ namespace GenerativeChaos.Api
         {
             builder.Services.AddOptions<CosmosDb>()
                 .Bind(builder.Configuration.GetSection(nameof(CosmosDb)));
+            
+            builder.Services.AddOptions<FileStorage>()
+                .Bind(builder.Configuration.GetSection(nameof(FileStorage)));
 
             builder.Services.AddOptions<OpenAi>()
                 .Bind(builder.Configuration.GetSection(nameof(OpenAi)));
@@ -94,9 +104,8 @@ namespace GenerativeChaos.Api
         {
             services.AddSingleton<SemanticKernelService, SemanticKernelService>();
             services.AddSingleton<CosmosDbService, CosmosDbService>();
-            
             services.AddScoped<IGalleryService, GalleryService>();
-
+            services.AddScoped<IFileStorageService, FileStorageService>();
         }
     }
 }

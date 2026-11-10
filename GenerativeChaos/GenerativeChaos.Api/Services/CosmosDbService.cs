@@ -63,8 +63,8 @@ public class CosmosDbService
         var result = new List<Design>();
 
         const string queryText = $"""
-                                  SELECT Top 5 
-                                      c.id, c.userInput, c.generatedDescription, c.torusConfig, VectorDistance(c.vectors, @vectors) as similarityScore
+                                  SELECT Top 10 
+                                      c.id, c.userInput, c.generatedDescription, c.torusConfig, c.previewUrl, VectorDistance(c.vectors, @vectors) as similarityScore
                                   FROM c  
                                   WHERE 
                                       VectorDistance(c.vectors, @vectors) > @similarityScore 
@@ -88,9 +88,15 @@ public class CosmosDbService
         return result;
     }
 
-    public async Task<List<Design>> GetDesignsAsync()
+    public async Task<List<Design>> GetDesignsRangeAsync(int skip, int take)
     {
-        var query = _designContainer.GetItemQueryIterator<Design>("SELECT c.id, c.userInput, c.torusConfig, c.generatedDescription FROM c");
+        var queryText = $@"
+            SELECT c.id, c.userInput, c.torusConfig, c.generatedDescription, c.previewUrl
+            FROM c
+            OFFSET {skip} LIMIT {take}
+        ";
+
+        var query = _designContainer.GetItemQueryIterator<Design>(queryText);
 
         var results = new List<Design>();
 
