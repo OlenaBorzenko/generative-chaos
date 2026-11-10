@@ -12,7 +12,7 @@ interface TorusKnotProps {
   savePreviewImage?: (id: string) => void;
 }
 
-export default function TorusCanvas({ config, id = '', isAdjustmentMode = false, scale = 250, width = 800, height = 800, onGenerateObj, savePreviewImage }: TorusKnotProps) {
+export default function TorusCanvas({ config, id = '', isAdjustmentMode = false, scale = 200, width = 800, height = 800, onGenerateObj, savePreviewImage }: TorusKnotProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const p5InstanceRef = useRef<p5 | null>(null);
 
@@ -126,7 +126,6 @@ export default function TorusCanvas({ config, id = '', isAdjustmentMode = false,
         }
 
         for (let i = 0; i < ringPoints.length - 1; i++) {
-          debugger;
           const ringA = ringPoints[i];
           const ringB = ringPoints[i + 1];
 

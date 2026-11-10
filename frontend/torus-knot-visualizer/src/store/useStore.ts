@@ -51,7 +51,7 @@ export type DesignConfig = {
   id: string;
   previewUrl: string;
   userInput: string;
-  torusConfig: typeof defaultConfig;
+  torusConfig: Config;
 };
 
 type StoreState = {

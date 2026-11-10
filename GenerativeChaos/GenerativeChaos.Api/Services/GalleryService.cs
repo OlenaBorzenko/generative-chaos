@@ -51,11 +51,11 @@ public class GalleryService : IGalleryService
     {
         var vectors = await _semanticKernelService.GetEmbeddingsAsync(userInput);
         
-        var cacheItems = await _cosmosDbService.GetSimilarAsync(vectors, _similarityScore);
+        var similarItems = await _cosmosDbService.GetSimilarAsync(vectors, _similarityScore);
 
-        return cacheItems.Select(x => new DesignDto
+        return similarItems.Select(x => new DesignDto
         {
-            id = x.id, 
+            id = x.id,
             Description = x.GeneratedDescription,
             PreviewUrl = x.PreviewUrl,
             TorusConfig = JsonSerializer.Deserialize<TorusConfig>(x.TorusConfig),

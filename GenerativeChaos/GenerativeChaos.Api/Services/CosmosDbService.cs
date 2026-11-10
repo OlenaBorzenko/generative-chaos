@@ -88,21 +88,6 @@ public class CosmosDbService
         return result;
     }
 
-    public async Task<List<Design>> GetDesignsAsync()
-    {
-        var query = _designContainer.GetItemQueryIterator<Design>("SELECT c.id, c.userInput, c.torusConfig, c.generatedDescription FROM c");
-
-        var results = new List<Design>();
-
-        while (query.HasMoreResults)
-        {
-            var response = await query.ReadNextAsync();
-            results.AddRange(response);
-        }
-
-        return results;
-    }
-
     public async Task<List<Design>> GetDesignsRangeAsync(int skip, int take)
     {
         var queryText = $@"

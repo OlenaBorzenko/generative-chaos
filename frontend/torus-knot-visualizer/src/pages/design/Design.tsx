@@ -127,7 +127,7 @@ export default function DesignDetail() {
                       [key]: Number(e.target.value),
                     }))
                   }
-                  step="0.1"
+                  step="1"
                   className={s.numberInput}
                 />
               )}

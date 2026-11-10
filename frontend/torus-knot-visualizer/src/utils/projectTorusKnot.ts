@@ -29,7 +29,6 @@ export function projectTorusKnot(
   cameraPosition: p5.Vector,
   cameraDirection: p5.Vector
 ): { lines: [p5.Vector, p5.Vector][] } {
-  debugger;
   const visibleLines: [p5.Vector, p5.Vector][] = [];
 
   for (const [a, b, c, d] of quads) {
