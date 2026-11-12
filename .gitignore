@@ -6,6 +6,7 @@
 obj
 bin
 .idea/
+.vite/
 
 # Generated files
 .docusaurus
