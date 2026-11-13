@@ -1,34 +1,218 @@
-/* Gallery.module.css */
 .container {
-  padding: 1rem;
+  min-height: calc(100vh - var(--nav-height));
+  padding: clamp(1.25rem, 3vw, 2.75rem);
+  background:
+    radial-gradient(ellipse at 50% 0, rgba(59, 46, 126, 0.18), transparent 50%),
+    var(--surface-base);
+}
+
+.galleryHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0 auto 2rem;
+  max-width: 1600px;
+}
+
+.eyebrow {
+  color: var(--color-accent);
+  font-family: var(--font-hud);
+  font-size: 0.64rem;
+  letter-spacing: 0.15em;
+}
+
+.galleryHeader h1 {
+  margin: 0.25rem 0 0;
+  color: #f5f3ff;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 600;
+  letter-spacing: -0.06em;
+}
+
+.galleryHeader h1 span {
+  color: var(--color-magenta);
+}
+
+.galleryHeader p {
+  margin: 0 0 0.5rem;
+  color: #a4a3bb;
+  font-size: 0.85rem;
 }
 
 .galleryGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1rem;
+  max-width: 1600px;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: clamp(0.85rem, 1.5vw, 1.4rem);
+  margin: 0 auto;
 }
 
 .gridItem {
-  display: flex;
-  flex-direction: column;
+  position: relative;
+  min-width: 0;
+  padding: 0.55rem;
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(145deg, rgba(25, 27, 53, 0.82), rgba(18, 20, 42, 0.55));
+  text-align: left;
+  transition: border-color 0.22s ease, box-shadow 0.22s ease, transform 0.22s ease;
+}
+
+.designButton {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
   cursor: pointer;
-  text-align: center;
+  text-align: left;
+}
+
+.deleteButton {
+  position: absolute;
+  z-index: 2;
+  top: 1rem;
+  right: 1rem;
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  place-items: center;
+  padding: 0.55rem;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+  color: #fff;
+  background: rgba(15, 14, 30, 0.85);
+  cursor: pointer;
+}
+
+.deleteButton svg {
+  width: 100%;
+  height: 100%;
+}
+
+.deleteButton:hover:not(:disabled) {
+  border-color: #ff9aaf;
+  color: #ff9aaf;
+}
+
+.deleteButton:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.designButton:focus-visible,
+.deleteButton:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+.gridItem:hover {
+  border-color: rgba(0, 240, 255, 0.55);
+  box-shadow: var(--glow-secondary);
+  transform: translateY(-3px);
+}
+
+.imageFrame {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 1;
+  border-radius: calc(var(--radius-md) - 2px);
+  background: #0a0b14;
+}
+
+.imageFrame::after {
+  position: absolute;
+  inset: 45% 0 0;
+  background: linear-gradient(transparent, rgba(4, 5, 12, 0.6));
+  content: "";
+  pointer-events: none;
 }
 
 .gridImage {
+  display: block;
   width: 100%;
-  border-radius: 10px;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.35s ease;
+}
+
+.gridItem:hover .gridImage {
+  transform: scale(1.04);
+}
+
+.cardIndex,
+.cardArrow {
+  position: absolute;
+  z-index: 1;
+  bottom: 0.65rem;
+  color: #f4f2ff;
+  font-family: var(--font-hud);
+  font-size: 0.64rem;
+}
+
+.cardIndex {
+  left: 0.7rem;
+  letter-spacing: 0.1em;
+}
+
+.cardArrow {
+  right: 0.7rem;
+  color: var(--color-accent);
+  font-size: 0.9rem;
 }
 
 .imageTitle {
-  margin-top: 0.2rem;
-  font-style: italic;
-  letter-spacing: 0.03rem;
-  font-size: 1rem;
-  color: #000000;
+  display: -webkit-box;
+  min-height: 2.75rem;
+  overflow: hidden;
+  margin: 0.5rem 0.2rem 0.1rem;
+  color: #c4c1d9;
+  font-size: 0.75rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .galleryButton {
-  margin-top: 1rem;
+  display: block;
+  min-width: 150px;
+  margin: 2rem auto 0;
+  border-color: rgba(108, 75, 255, 0.6);
+  color: #e8e4ff;
+  background: rgba(59, 46, 126, 0.38);
+  font-family: var(--font-hud);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.emptyState {
+  padding: 3rem 1rem;
+  color: #a4a3bb;
+  text-align: center;
+}
+
+.error,
+.status {
+  margin: 1.5rem auto;
+  color: #ffb6c5;
+  text-align: center;
+}
+
+.status {
+  color: #c4c1d9;
+}
+
+@media (max-width: 560px) {
+  .galleryHeader {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .galleryHeader p {
+    margin: 0;
+  }
 }

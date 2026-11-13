@@ -58,23 +58,31 @@ public class CosmosDbService
         );
     }
 
-    public async Task<List<Design>> GetSimilarAsync(ReadOnlyMemory<float> vectors, double similarityScore)
+    public async Task DeleteDesignAsync(string id)
     {
+        await _designContainer.DeleteItemAsync<Design>(id, GetPK(id));
+    }
+
+    public async Task<List<Design>> GetSimilarAsync(ReadOnlyMemory<float> vectors, double minSimilarityScore, int take = 10)
+    {
+        if (!double.IsFinite(minSimilarityScore) || minSimilarityScore is < -1 or > 1)
+            throw new ArgumentOutOfRangeException(nameof(minSimilarityScore), "Cosine similarity must be between -1 and 1.");
+
         var result = new List<Design>();
 
         const string queryText = $"""
-                                  SELECT Top 10 
-                                      c.id, c.userInput, c.generatedDescription, c.torusConfig, c.previewUrl, VectorDistance(c.vectors, @vectors) as similarityScore
-                                  FROM c  
-                                  WHERE 
-                                      VectorDistance(c.vectors, @vectors) > @similarityScore 
+                                  SELECT TOP @take
+                                      c.id, c.userInput, c.generatedDescription, c.torusConfig, c.previewUrl, c.fusedFrom
+                                  FROM c
+                                  WHERE VectorDistance(c.vectors, @vectors) >= @minSimilarityScore
                                   ORDER BY 
                                       VectorDistance(c.vectors, @vectors)
                                   """;
 
         var queryDef = new QueryDefinition(query: queryText)
-            .WithParameter("@vectors", vectors)
-            .WithParameter("@similarityScore", similarityScore);
+            .WithParameter("@vectors", vectors.ToArray())
+            .WithParameter("@minSimilarityScore", minSimilarityScore)
+            .WithParameter("@take", Math.Clamp(take, 1, 100));
 
         using FeedIterator<Design> resultSet = _designContainer.GetItemQueryIterator<Design>(queryDef);
 
@@ -93,6 +101,7 @@ public class CosmosDbService
         var queryText = $@"
             SELECT c.id, c.userInput, c.torusConfig, c.generatedDescription, c.previewUrl
             FROM c
+            ORDER BY c._ts DESC
             OFFSET {skip} LIMIT {take}
         ";
 
