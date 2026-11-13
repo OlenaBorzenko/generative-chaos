@@ -1,0 +1,38 @@
+.wrapper {
+  position: relative;
+  width: fit-content;
+  max-width: 100%;
+}
+
+.wrapper canvas {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.controls {
+  position: absolute;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  bottom: 0.75rem;
+  left: 0.75rem;
+}
+
+.controls button {
+  padding: 0.4rem 0.65rem;
+  border: 1px solid #7593ad;
+  border-radius: 0.3rem;
+  background: #111b29e8;
+  color: #fff;
+  cursor: pointer;
+}
+
+.controls button:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+.controls button[aria-pressed='true'] {
+  background: #285d78;
+}

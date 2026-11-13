@@ -1,0 +1,62 @@
+.card {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid rgba(108, 75, 255, 0.35);
+  border-radius: var(--radius-md, 10px);
+  background: var(--surface-panel, #12142a);
+  color: #f5f4ff;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.selected {
+  border-color: var(--color-magenta);
+  box-shadow: var(--glow-magenta);
+}
+
+.preview {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: contain;
+  background: var(--surface-base, #0a0b14);
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.35rem;
+  padding: 0.4rem;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.actions button {
+  display: inline-flex;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border-radius: var(--radius-sm);
+}
+
+.selectButton {
+  border-color: rgba(255, 46, 136, 0.55);
+  background: rgba(255, 46, 136, 0.08);
+  color: var(--color-magenta);
+}
+
+.selectButton[aria-pressed='true'] {
+  background: rgba(255, 46, 136, 0.2);
+}
+
+.selectButton:disabled {
+  opacity: 0.45;
+}
+
+.openButton {
+  border-color: rgba(0, 240, 255, 0.4);
+  background: transparent;
+  color: var(--color-accent);
+}

@@ -22,6 +22,21 @@ public class GalleryController(IGalleryService galleryService, IFileStorageServi
             return BadRequest(new { message = "Error generating design details", error = ex.Message });
         }
     }
+
+    [HttpPost("fusion")]
+    public async Task<IActionResult> FuseDesigns([FromBody] FusionRequest request)
+    {
+        try
+        {
+            var response = await galleryService.FuseDesignsAsync(request);
+
+            return Ok(response);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = "Error fusing designs", error = ex.Message });
+        }
+    }
     
     [HttpPut("designs/{designId}")]
     public async Task<IActionResult> UpdateConfig(string designId, [FromBody] TorusConfig config)
@@ -29,6 +44,21 @@ public class GalleryController(IGalleryService galleryService, IFileStorageServi
         await galleryService.UpdateDesignConfigAsync(designId, config);
 
         return Ok(new { message = "Config updated", designId });
+    }
+
+    [HttpDelete("designs/{designId}")]
+    public async Task<IActionResult> DeleteDesign(string designId)
+    {
+        try
+        {
+            return await galleryService.DeleteDesignAsync(designId)
+                ? NoContent()
+                : NotFound(new { message = "Design not found" });
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new { message = "Error deleting design" });
+        }
     }
     
     [HttpPost("preview/{designId}")]

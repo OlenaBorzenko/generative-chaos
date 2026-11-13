@@ -19,6 +19,10 @@ public class Design
     [VectorStoreRecordData]
     public string? TorusConfig { get; set; }
 
+    [VectorStoreRecordData]
+    [Newtonsoft.Json.JsonProperty(NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+    public string[]? FusedFrom { get; set; }
+
     [VectorStoreRecordVector(Dimensions: 1536, DistanceFunction: DistanceFunction.CosineSimilarity, IndexKind: IndexKind.DiskAnn)]
     public ReadOnlyMemory<float> Vectors { get; set; }
 

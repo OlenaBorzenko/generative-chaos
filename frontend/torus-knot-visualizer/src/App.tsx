@@ -3,6 +3,7 @@ import MainView from './pages/home/Home';
 import Gallery from './pages/gallery/Gallery';
 import DesignDetail from './pages/design/Design';
 import NavBar from './components/header/NavBar';
+import './App.css';
 
 function App() {
   return (

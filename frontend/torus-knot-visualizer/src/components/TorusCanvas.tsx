@@ -1,5 +1,7 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import p5 from 'p5';
+import CameraControls from './CameraControls';
+import styles from './CameraControls.module.css';
 
 interface TorusKnotProps {
   config: any;
@@ -10,20 +12,67 @@ interface TorusKnotProps {
   height?: number;
   onGenerateObj?: (ringPoints: p5.Vector[][], quads: [p5.Vector, p5.Vector, p5.Vector, p5.Vector][]) => void;
   savePreviewImage?: (id: string) => void;
+  interactive?: boolean;
+  autoRotate?: boolean;
 }
 
-export default function TorusCanvas({ config, id = '', isAdjustmentMode = false, scale = 200, width = 800, height = 800, onGenerateObj, savePreviewImage }: TorusKnotProps) {
+export default function TorusCanvas({ config, id = '', isAdjustmentMode = false, scale = 200, width = 800, height = 800, onGenerateObj, savePreviewImage, interactive = true, autoRotate = false }: TorusKnotProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const p5InstanceRef = useRef<p5 | null>(null);
+  const callbacksRef = useRef({ onGenerateObj, savePreviewImage });
+  callbacksRef.current = { onGenerateObj, savePreviewImage };
+  const [rotating, setRotating] = useState(autoRotate);
+  const rotatingRef = useRef(rotating);
+  rotatingRef.current = rotating;
+  const controlsRef = useRef<{ reset: () => void; zoom: (factor: number) => void; wake: () => void } | null>(null);
+
+  useEffect(() => setRotating(autoRotate), [autoRotate]);
+  useEffect(() => {
+    controlsRef.current?.wake();
+  }, [rotating]);
 
   useEffect(() => {
     if (!containerRef.current) return;
 
+    let cleanup = () => {};
     const sketch = (s: p5) => {
       const { bgColor } = config;
       let knotPoints: p5.Vector[] = [];
       let ringPoints: p5.Vector[][] = [];
       let quads: [p5.Vector, p5.Vector, p5.Vector, p5.Vector][] = [];
+      let geometry: p5.Geometry;
+      let zoom = 1;
+      let rotation = 0;
+      let dragging = false;
+      let lastInteraction = 0;
+      let lastFrame = 0;
+
+      const wake = () => {
+        lastInteraction = performance.now();
+        s.loop();
+      };
+
+      const reset = () => {
+        zoom = 1;
+        rotation = 0;
+        rotatingRef.current = false;
+        setRotating(false);
+        s.camera();
+        s.ortho(-width / 2, width / 2, -height / 2, height / 2, -1000, 1000);
+        // orbitControl keeps its damping velocities on the renderer.
+        const renderer = (s as unknown as { _renderer: {
+          rotateVelocity: p5.Vector; moveVelocity: p5.Vector; zoomVelocity: number;
+        } })._renderer;
+        renderer.rotateVelocity.set(0, 0);
+        renderer.moveVelocity.set(0, 0);
+        renderer.zoomVelocity = 0;
+        wake();
+      };
+
+      const changeZoom = (factor: number) => {
+        zoom = Math.max(0.1, Math.min(10, zoom * factor));
+        wake();
+      };
 
       s.setup = () => {
         const canvas = s.createCanvas(width, height, s.WEBGL);
@@ -43,12 +92,73 @@ export default function TorusCanvas({ config, id = '', isAdjustmentMode = false,
         drawDepthFill();
         drawWireframe();
 
-        if (savePreviewImage && id !== '' && !isAdjustmentMode) {
-          savePreviewImage(id);
+        if (callbacksRef.current.savePreviewImage && id !== '' && !isAdjustmentMode) {
+          callbacksRef.current.savePreviewImage(id);
         }
 
-        if (onGenerateObj) {
-          onGenerateObj(ringPoints, quads);
+        if (callbacksRef.current.onGenerateObj) {
+          callbacksRef.current.onGenerateObj(ringPoints, quads);
+        }
+
+        // The installed p5 runtime exposes buildGeometry, but its typings predate it.
+        geometry = (s as p5 & { buildGeometry: (draw: () => void) => p5.Geometry }).buildGeometry(() => {
+          drawDepthFill();
+          drawWireframe();
+        });
+
+        controlsRef.current = { reset, zoom: changeZoom, wake };
+        const element = canvas.elt;
+        const onPointerDown = () => { dragging = true; wake(); };
+        const onPointerUp = () => { dragging = false; wake(); };
+        const onWheel = (event: WheelEvent) => {
+          event.preventDefault();
+          changeZoom(Math.exp(-Math.max(-100, Math.min(100, event.deltaY)) * 0.002));
+        };
+        const onKeyDown = (event: KeyboardEvent) => {
+          const target = event.target as HTMLElement | null;
+          if (event.key.toLowerCase() === 'r' && !event.repeat &&
+              !target?.closest('input, textarea, select, [contenteditable="true"]')) {
+            reset();
+          }
+        };
+        if (interactive) {
+          element.addEventListener('pointerdown', onPointerDown);
+          window.addEventListener('pointerup', onPointerUp);
+          window.addEventListener('pointercancel', onPointerUp);
+          element.addEventListener('wheel', onWheel, { passive: false });
+          window.addEventListener('keydown', onKeyDown);
+        }
+        cleanup = () => {
+          element.removeEventListener('pointerdown', onPointerDown);
+          window.removeEventListener('pointerup', onPointerUp);
+          window.removeEventListener('pointercancel', onPointerUp);
+          element.removeEventListener('wheel', onWheel);
+          window.removeEventListener('keydown', onKeyDown);
+          controlsRef.current = null;
+        };
+        if (interactive && rotatingRef.current) wake();
+      };
+
+      s.draw = () => {
+        const now = performance.now();
+        const elapsed = lastFrame ? Math.min((now - lastFrame) / 1000, 0.1) : 0;
+        lastFrame = now;
+        s.background(bgColor);
+        if (interactive) {
+          // Zoom is applied as model scale so the orthographic projection stays fixed.
+          s.orbitControl(1, 1, 0);
+          if (rotatingRef.current) rotation += elapsed * 0.5;
+        }
+        s.rotateX(s.HALF_PI * 2);
+        s.rotateY(rotation);
+        s.scale(scale * zoom);
+        s.fill(config.fillColor);
+        s.stroke(config.wireColor);
+        s.strokeWeight(0.5);
+        s.model(geometry);
+        if (!interactive || (!rotatingRef.current && !dragging && now - lastInteraction > 1200)) {
+          s.noLoop();
+          lastFrame = 0;
         }
       };
 
@@ -227,9 +337,22 @@ export default function TorusCanvas({ config, id = '', isAdjustmentMode = false,
 
     p5InstanceRef.current = new p5(sketch, containerRef.current);
     return () => {
+      cleanup();
       p5InstanceRef.current?.remove();
     };
-  }, [config, width, height, id, isAdjustmentMode]);
+  }, [config, width, height, id, isAdjustmentMode, scale, interactive]);
 
-  return <div ref={containerRef}></div>;
+  return (
+    <div className={styles.wrapper}>
+      <div ref={containerRef} />
+      {interactive && (
+        <CameraControls
+          rotating={rotating}
+          onReset={() => controlsRef.current?.reset()}
+          onZoom={factor => controlsRef.current?.zoom(factor)}
+          onToggleRotate={() => setRotating(value => !value)}
+        />
+      )}
+    </div>
+  );
 }
